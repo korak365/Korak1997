@@ -1,0 +1,17 @@
+{
+    "actorSpecification": 1,
+    "name": "youtube-comment-question-extractor",
+    "title": "YouTube Comment Question Extractor",
+    "description": "Extracts questions from YouTube video comments to help creators brainstorm new content ideas.",
+    "version": "0.0",
+    "meta": {
+        "templateId": "ai-generated-actor",
+        "generatedBy": "copilot-2026"
+    },
+    "input": "./input_schema.json",
+    "output": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "dockerfile": "../Dockerfile"
+}

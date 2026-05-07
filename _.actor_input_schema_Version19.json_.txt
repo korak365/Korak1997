@@ -1,0 +1,23 @@
+{
+    "title": "Input Schema for YouTube Comment Question Extractor",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "videoUrls": {
+            "title": "YouTube Video URLs",
+            "type": "array",
+            "description": "List of YouTube video URLs to scrape for comments containing questions.",
+            "editor": "requestListSources",
+            "prefill": [
+                { "url": "https://www.youtube.com/watch?v=example_video_id" }
+            ]
+        },
+        "maxComments": {
+            "title": "Maximum Comments per Video",
+            "type": "integer",
+            "description": "Number of comments to scrape per video.",
+            "default": 100
+        }
+    },
+    "required": ["videoUrls"]
+}

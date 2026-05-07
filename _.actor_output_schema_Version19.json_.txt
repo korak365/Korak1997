@@ -1,0 +1,11 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Output Schema for YouTube Comment Question Extractor",
+    "properties": {
+        "overview": {
+            "type": "string",
+            "title": "Questions Extracted",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+        }
+    }
+}

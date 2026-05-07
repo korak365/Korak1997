@@ -1,0 +1,86 @@
+// Import required modules
+import { Actor } from 'apify';
+import { Dataset } from 'apify';
+import fetch from 'node-fetch';
+
+await Actor.init();
+
+const { videoUrls = [], maxComments = 100 } = (await Actor.getInput()) || {};
+const YOUTUBE_COMMENTS_API = "https://www.googleapis.com/youtube/v3/commentThreads";
+
+// Define a helper function to extract questions from comments
+const extractQuestions = (comment) => {
+    const questions = [];
+    const regex = /\b(what|how|why|when|who|where|is|can|do|did|are|should|could)[^?]*\?/gi;
+    const matches = comment.match(regex);
+
+    if (matches) {
+        questions.push(...matches.map(q => q.trim()));
+    }
+    return questions;
+};
+
+// Function to fetch comments from the YouTube API
+async function fetchYouTubeComments(videoId) {
+    const comments = [];
+    let nextPageToken;
+    const API_KEY = process.env.YOUTUBE_API_KEY; // Add your YouTube API Key here.
+
+    do {
+        const url = `${YOUTUBE_COMMENTS_API}?part=snippet&videoId=${videoId}&maxResults=100&pageToken=${nextPageToken || ''}&key=${API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.error) {
+            console.error(`YouTube API error: ${data.error.message}`);
+            break;
+        }
+
+        (data.items || []).forEach(item => {
+            const commentText = item.snippet.topLevelComment.snippet.textDisplay;
+            const commenter = item.snippet.topLevelComment.snippet.authorDisplayName;
+            const questions = extractQuestions(commentText);
+
+            if (questions.length > 0) {
+                comments.push({
+                    commenter,
+                    commentText,
+                    questions,
+                });
+            }
+        });
+
+        nextPageToken = data.nextPageToken;
+    } while (nextPageToken && comments.length < maxComments);
+
+    return comments.slice(0, maxComments);
+}
+
+// Process each video URL
+for (const videoUrl of videoUrls) {
+    console.log(`Processing video: ${videoUrl}`);
+
+    const videoIdMatch = videoUrl.match(/v=([^&]+)/);
+    const videoId = videoIdMatch ? videoIdMatch[1] : null;
+
+    if (!videoId) {
+        console.error(`Invalid YouTube video URL: ${videoUrl}`);
+        continue;
+    }
+
+    const comments = await fetchYouTubeComments(videoId);
+
+    for (const comment of comments) {
+        for (const question of comment.questions) {
+            await Dataset.pushData({
+                videoUrl,
+                commenter: comment.commenter,
+                commentText: comment.commentText,
+                questionText: question,
+                timestamp: new Date().toISOString(),
+            });
+        }
+    }
+}
+
+await Actor.exit();

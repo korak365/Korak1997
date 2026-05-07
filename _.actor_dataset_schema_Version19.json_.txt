@@ -1,0 +1,55 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "videoUrl": {
+            "type": "string",
+            "title": "YouTube Video URL"
+        },
+        "commenter": {
+            "type": "string",
+            "title": "Commenter Username"
+        },
+        "commentText": {
+            "type": "string",
+            "title": "Comment Text"
+        },
+        "questionText": {
+            "type": "string",
+            "title": "Extracted Question"
+        },
+        "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Extraction Timestamp"
+        }
+    },
+    "views": {
+        "overview": {
+            "title": "Questions Overview",
+            "transformation": {
+                "fields": ["videoUrl", "commenter", "questionText", "timestamp"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "videoUrl": {
+                        "label": "Video URL",
+                        "format": "link"
+                    },
+                    "commenter": {
+                        "label": "Commenter Username",
+                        "format": "text"
+                    },
+                    "questionText": {
+                        "label": "Question Extracted",
+                        "format": "text"
+                    },
+                    "timestamp": {
+                        "label": "Extraction Timestamp",
+                        "format": "datetime-local"
+                    }
+                }
+            }
+        }
+    }
+}
